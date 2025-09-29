@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI Voice Generator by Aryan</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/feather-icons"></script>
+  <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .gradient-text {
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradientBG 3s ease infinite;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 font-[Inter] p-4 md:p-8">
+  <div class="max-w-4xl mx-auto">
+    <header class="text-center mb-10">
+      <div class="inline-flex items-center justify-center mb-4">
+        <i data-feather="volume-2" class="w-8 h-8 text-indigo-500 mr-2"></i>
+        <h1 class="text-4xl md:text-5xl font-bold gradient-text">AI Voice Generator <span class="text-sm md:text-base font-normal">by Aryan</span></h1>
+      </div>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto">Transform text into lifelike speech with our advanced AI technology. Perfect for content creators, businesses, video editors, and developers.</p>
+    </header>
+
+    <div class="bg-white/80 backdrop-blur-lg shadow-xl rounded-2xl p-6 md:p-8 space-y-8 border border-white/20">
+      <div class="relative">
+        <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+          <i data-feather="edit-3" class="w-4 h-4 mr-1"></i>
+          Text to Convert
+        </label>
+        <textarea 
+          id="text-input" 
+          rows="6" 
+          class="w-full border-2 border-gray-200 rounded-xl p-4 resize-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200" 
+          placeholder="Type or paste your text here..."></textarea>
+        <div class="absolute bottom-3 right-3 bg-white/80 px-2 py-1 rounded-lg">
+          <p id="char-count" class="text-xs text-gray-500">0/2000 characters</p>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-8">
+        <div class="space-y-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+              <i data-feather="search" class="w-4 h-4 mr-1"></i>
+              Find Voice
+            </label>
+            <div class="relative">
+              <input 
+                id="voice-search" 
+                class="w-full border-2 border-gray-200 rounded-xl p-3 pl-10 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200" 
+                placeholder="Search voices..." />
+              <i data-feather="search" class="absolute left-3 top-3.5 w-4 h-4 text-gray-400"></i>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+              <i data-feather="user" class="w-4 h-4 mr-1"></i>
+              Select Voice
+            </label>
+            <select 
+              id="voice-select" 
+              class="w-full border-2 border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 appearance-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWNoZXZyb24tZG93biI+PHBhdGggZD0ibTYgOSA2IDYgNi02Ii8+PC9zdmc+')] bg-no-repeat bg-[right_0.75rem_center] bg-[length:1.25rem]">
+            </select>
+            <p id="voice-desc" class="text-sm text-gray-500 mt-2 px-1">Select a voice to hear its characteristics</p>
+          </div>
+        </div>
+
+        <div class="space-y-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+              <i data-feather="sliders" class="w-4 h-4 mr-1"></i>
+              Voice Stability: <span id="stability-val" class="ml-auto font-medium text-indigo-600">0.5</span>
+            </label>
+            <input 
+              id="stability" 
+              type="range" 
+              min="0" 
+              max="1" 
+              step="0.1" 
+              value="0.5" 
+              class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+            <p class="text-xs text-gray-500 mt-1">More stable <span class="float-right">More expressive</span></p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+              <i data-feather="zap" class="w-4 h-4 mr-1"></i>
+              Similarity Boost: <span id="similarity-val" class="ml-auto font-medium text-purple-600">0.8</span>
+            </label>
+            <input 
+              id="similarity" 
+              type="range" 
+              min="0" 
+              max="1" 
+              step="0.1" 
+              value="0.8" 
+              class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
+            <p class="text-xs text-gray-500 mt-1">Less similar <span class="float-right">More similar</span></p>
+          </div>
+        </div>
+      </div>
+
+      <div id="error-box" class="hidden p-4 bg-red-50 border-l-4 border-red-500 rounded-lg text-red-700 text-sm flex items-start">
+        <i data-feather="alert-triangle" class="w-5 h-5 mr-2 mt-0.5 flex-shrink-0"></i>
+        <span id="error-message"></span>
+      </div>
+
+      <div id="audio-section" class="hidden space-y-4">
+        <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+          <i data-feather="headphones" class="w-4 h-4 mr-1"></i>
+          Your Generated Audio
+        </label>
+        <div class="bg-gray-50 rounded-xl p-4 border-2 border-gray-100">
+          <audio id="audio-player" controls class="w-full"></audio>
+          <div class="flex gap-3 mt-3">
+            <button id="play-btn" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 transition-all">
+              <i data-feather="play" class="w-4 h-4"></i> Play
+            </button>
+            <button id="pause-btn" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 transition-all">
+              <i data-feather="pause" class="w-4 h-4"></i> Pause
+            </button>
+            <a id="download-link" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 transition-all text-center">
+              <i data-feather="download" class="w-4 h-4"></i> Download
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <button 
+        id="generate-btn" 
+        class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-6 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
+        disabled>
+        <i data-feather="loader" class="w-5 h-5 animate-spin"></i>
+        <span>Loading voices...</span>
+      </button>
+    </div>
+
+    <footer class="mt-12 text-center text-sm text-gray-500">
+      <p>Developed by Aryan Saini</p>
+    </footer>
+  </div>
+
+  <script>
+    // Initialize feather icons
+    feather.replace();
+    
+    // Configuration (same as before)
+    const PROXY_MODE = true;
+    const PROXY_URL = "https://elevenlabs-proxy-server-lipn.onrender.com";
+    const PROXY_AUTH_HEADER = "Bearer xxx";
+    const DIRECT_API_KEY = "YOUR_XI_API_KEY_HERE";
+
+    // DOM references (same as before)
+    const textInput = document.getElementById("text-input");
+    const charCount = document.getElementById("char-count");
+    const voiceSelect = document.getElementById("voice-select");
+    const voiceDesc = document.getElementById("voice-desc");
+    const stabilitySlider = document.getElementById("stability");
+    const stabilityVal = document.getElementById("stability-val");
+    const similaritySlider = document.getElementById("similarity");
+    const similarityVal = document.getElementById("similarity-val");
+    const generateBtn = document.getElementById("generate-btn");
+    const errorBox = document.getElementById("error-box");
+    const errorMessage = document.getElementById("error-message");
+    const audioSection = document.getElementById("audio-section");
+    const audioPlayer = document.getElementById("audio-player");
+    const playBtn = document.getElementById("play-btn");
+    const pauseBtn = document.getElementById("pause-btn");
+    const downloadLink = document.getElementById("download-link");
+    const voiceSearch = document.getElementById("voice-search");
+
+    // State
+    let voicesMap = {};
+    let voicesList = [];
+
+    // Utility functions (same as before)
+    function showError(msg) {
+      errorMessage.textContent = msg;
+      errorBox.classList.remove("hidden");
+    }
+    function hideError() {
+      errorBox.classList.add("hidden");
+      errorMessage.textContent = "";
+    }
+
+    async function fetchVoices() {
+      generateBtn.disabled = true;
+      generateBtn.innerHTML = '<i data-feather="loader" class="w-5 h-5 animate-spin"></i><span>Loading voices...</span>';
+      feather.replace();
+      hideError();
+
+      try {
+        const url = PROXY_MODE ? `${PROXY_URL}/v1/voices` : "https://api.elevenlabs.io/v1/voices";
+        const headers = PROXY_MODE
+          ? (PROXY_AUTH_HEADER ? { "Authorization": PROXY_AUTH_HEADER } : {})
+          : { "xi-api-key": DIRECT_API_KEY };
+
+        const res = await fetch(url, { method: "GET", headers });
+
+        if (!res.ok) {
+          let bodyText = await res.text();
+          try { bodyText = JSON.parse(bodyText); } catch(e){}
+          throw new Error(`Failed to load voices (${res.status}): ${JSON.stringify(bodyText)}`);
+        }
+
+        const data = await res.json();
+        const list = Array.isArray(data) ? data : (data.voices || []);
+        if (!Array.isArray(list) || list.length === 0) {
+          throw new Error("No voices returned. Make sure your API key / proxy has access to voices.");
+        }
+
+        voicesList = list;
+        voicesMap = {};
+        voiceSelect.innerHTML = "";
+
+        list.forEach(v => {
+          voicesMap[v.voice_id] = v;
+          const opt = document.createElement("option");
+          opt.value = v.voice_id;
+          const extras = [];
+          if (v.preview?.language) extras.push(v.preview.language);
+          if (v.category) extras.push(v.category);
+          opt.textContent = `${v.name}${extras.length ? " — " + extras.join(", ") : ""}`;
+          opt.dataset.description = v.description || v.preview?.text || "";
+          voiceSelect.appendChild(opt);
+        });
+
+        let defaultId = null;
+        for (const v of list) {
+          if (/rachel/i.test(v.name)) { defaultId = v.voice_id; break; }
+        }
+        if (!defaultId && list.length) defaultId = list[0].voice_id;
+        if (defaultId) {
+          voiceSelect.value = defaultId;
+          setVoiceDescription(defaultId);
+        }
+
+        generateBtn.disabled = false;
+        generateBtn.innerHTML = '<i data-feather="volume-2" class="w-5 h-5"></i><span>Generate Speech</span>';
+        feather.replace();
+      } catch (err) {
+        showError(err.message || String(err));
+        generateBtn.disabled = true;
+        generateBtn.innerHTML = '<i data-feather="alert-circle" class="w-5 h-5"></i><span>Failed to load</span>';
+        feather.replace();
+        console.error(err);
+      }
+    }
+
+    function setVoiceDescription(voiceId) {
+      const v = voicesMap[voiceId];
+      if (!v) {
+        voiceDesc.textContent = "Selected voice description not available";
+        return;
+      }
+      voiceDesc.textContent = v.description || v.preview?.text || `${v.name} (${v.voice_id})`;
+    }
+
+    function filterVoices(q) {
+      q = (q || "").trim().toLowerCase();
+      for (let i = 0; i < voiceSelect.options.length; i++) {
+        const opt = voiceSelect.options[i];
+        opt.hidden = q && !opt.textContent.toLowerCase().includes(q);
+      }
+      const selectedOpt = voiceSelect.selectedOptions[0];
+      if (selectedOpt && selectedOpt.hidden) {
+        const firstVisible = Array.from(voiceSelect.options).find(o => !o.hidden);
+        if (firstVisible) {
+          voiceSelect.value = firstVisible.value;
+          setVoiceDescription(firstVisible.value);
+        }
+      }
+    }
+
+    async function generateSpeech() {
+      hideError();
+      const text = textInput.value.trim();
+      if (!text) {
+        showError("Please enter text to convert.");
+        return;
+      }
+      const stability = parseFloat(stabilitySlider.value);
+      const similarity = parseFloat(similaritySlider.value);
+      const voiceId = voiceSelect.value;
+
+      generateBtn.disabled = true;
+      generateBtn.innerHTML = '<i data-feather="loader" class="w-5 h-5 animate-spin"></i><span>Generating...</span>';
+      feather.replace();
+      audioSection.classList.add("hidden");
+
+      try {
+        const url = PROXY_MODE ? `${PROXY_URL}/v1/text-to-speech/${voiceId}` : `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`;
+        const headers = PROXY_MODE
+          ? {
+              ...(PROXY_AUTH_HEADER ? { "Authorization": PROXY_AUTH_HEADER } : {}),
+              "Content-Type": "application/json",
+              "Accept": "audio/mpeg"
+            }
+          : {
+              "xi-api-key": DIRECT_API_KEY,
+              "Content-Type": "application/json",
+              "Accept": "audio/mpeg"
+            };
+
+        const body = JSON.stringify({
+          text,
+          model_id: "eleven_multilingual_v2",
+          voice_settings: { stability, similarity_boost: similarity }
+        });
+
+        const res = await fetch(url, { method: "POST", headers, body });
+
+        const ct = res.headers.get("content-type") || "";
+        if (!res.ok) {
+          let errText;
+          if (ct.includes("application/json")) {
+            const j = await res.json().catch(()=>null);
+            errText = j?.error || j?.detail || JSON.stringify(j) || `${res.status} ${res.statusText}`;
+          } else {
+            errText = `${res.status} ${res.statusText}`;
+          }
+
+          if (res.status === 403 || /forbidden/i.test(errText)) {
+            throw new Error("Permission error: your API key or account may not have access to that voice.");
+          }
+          if (res.status === 404 || /not found/i.test(errText)) {
+            throw new Error("Voice not found: that voice_id may not exist in this account.");
+          }
+          throw new Error("Failed to generate speech: " + errText);
+        }
+
+        if (ct.includes("application/json")) {
+          const j = await res.json().catch(()=>null);
+          throw new Error("Unexpected response: " + (JSON.stringify(j) || "no details"));
+        }
+
+        const blob = await res.blob();
+        const urlBlob = URL.createObjectURL(blob);
+        audioPlayer.src = urlBlob;
+        downloadLink.href = urlBlob;
+        downloadLink.setAttribute("download", `ai-voice-${new Date().toISOString().slice(0,10)}.mp3`);
+        audioSection.classList.remove("hidden");
+      } catch (err) {
+        showError(err.message || String(err));
+      } finally {
+        generateBtn.disabled = false;
+        generateBtn.innerHTML = '<i data-feather="volume-2" class="w-5 h-5"></i><span>Generate Speech</span>';
+        feather.replace();
+      }
+    }
+
+    // Event listeners
+    textInput.addEventListener("input", () => {
+      const count = textInput.value.length;
+      charCount.textContent = `${count}/2000 characters`;
+      charCount.className = `text-xs ${count > 2000 ? 'text-red-500' : 'text-gray-500'}`;
+    });
+
+    voiceSelect.addEventListener("change", () => {
+      setVoiceDescription(voiceSelect.value);
+    });
+
+    voiceSearch.addEventListener("input", () => filterVoices(voiceSearch.value));
+
+    stabilitySlider.addEventListener("input", () => {
+      stabilityVal.textContent = stabilitySlider.value;
+    });
+
+    similaritySlider.addEventListener("input", () => {
+      similarityVal.textContent = similaritySlider.value;
+    });
+
+    playBtn.addEventListener("click", () => audioPlayer.play());
+    pauseBtn.addEventListener("click", () => audioPlayer.pause());
+    generateBtn.addEventListener("click", generateSpeech);
+
+    // Initialize
+    fetchVoices();
+  </script>
+</body>
+</html>
+
